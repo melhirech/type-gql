@@ -1,10 +1,10 @@
 import { ApolloServer } from 'apollo-server-express'
-import * as Express from 'express'
+import Express from 'express'
 import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'
 import {createConnection} from 'typeorm'
 
-import {RegisterResolver} from './modules/user/Register'
+import {RegisterResolver} from './modules/user/register/Register'
 
 
 const main = async () => {
@@ -15,7 +15,7 @@ const main = async () => {
         resolvers: [RegisterResolver],
     });
 
-    const apolloServer = new ApolloServer({schema})
+    const apolloServer = new ApolloServer({ schema })
     const app = Express()
     apolloServer.applyMiddleware({app})
 
