@@ -3,14 +3,14 @@ import { ApolloServer } from 'apollo-server-express'
 import Express from 'express'
 import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'
-import {createConnection} from 'typeorm'
+import { createConnection } from 'typeorm'
 import session from 'express-session'
 import ConnectRedis from 'connect-redis'
 import { redis } from './../redis';
 import cors from 'cors'
 
-import {RegisterResolver} from './modules/user/register/Register'
-import { LoginResolver} from './modules/user/Login'
+import { RegisterResolver } from './modules/user/Register'
+import { LoginResolver } from './modules/user/Login'
 
 const main = async () => {
     //connect to Postgres
@@ -18,12 +18,13 @@ const main = async () => {
 
     const schema = await buildSchema({
         resolvers: [RegisterResolver, LoginResolver, MeResolver],
+        authChecker: ({ context: { req } }) => !!req.session.userId
     });
 
-    const apolloServer = new ApolloServer({ 
+    const apolloServer = new ApolloServer({
         schema,
-        context: ({req}: any) => ({req})
-     })
+        context: ({ req }: any) => ({ req })
+    })
 
     const app = Express()
     app.use(cors({
@@ -48,7 +49,7 @@ const main = async () => {
         })
     );
 
-    apolloServer.applyMiddleware({app})
+    apolloServer.applyMiddleware({ app })
 
     app.listen(3000, () => {
         console.log('Server started at http://localhost:3000/graphql ...')
