@@ -1,24 +1,41 @@
-import { Resolver, Query, Mutation, Arg, UseMiddleware } from 'type-graphql'
-import bcrypt from 'bcryptjs'
-import { RegisterInput } from './register/RegisterInput'
-import { User } from '../../entity/User'
-import { isAuth } from '../middleware/isAuth';
+import { Resolver, Query, Mutation, Arg, UseMiddleware } from "type-graphql";
+import bcrypt from "bcryptjs";
+
+import { User } from "../../entity/User";
+import { RegisterInput } from "./register/RegisterInput";
+import { isAuth } from "../middleware/isAuth";
+import { logger } from "../middleware/logger";
+import { sendEmail } from "../utils/sendEmail";
+import { createConfirmationUrl } from "../utils/createConfirmationUrl";
 
 @Resolver()
 export class RegisterResolver {
+    @UseMiddleware(isAuth, logger)
     @Query(() => String)
-    @UseMiddleware(isAuth)
     async hello() {
-        return "Hello World!"
+        return "Hello World!";
     }
 
     @Mutation(() => User)
-    async register(
-        @Arg("data") { firstName, lastName, email, password }: RegisterInput
-    ): Promise<User> {
-        const hashedPassword = await bcrypt.hash(password, 12)
-        const newUser = await User.create({ firstName, lastName, email, password: hashedPassword }).save()
+    async register(@Arg("data")
+    {
+        email,
+        firstName,
+        lastName,
+        password
+    }: RegisterInput): Promise<User> {     
 
-        return newUser
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const user = await User.create({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword
+        }).save();
+
+        await sendEmail(email, await createConfirmationUrl(user.id));
+
+        return user;
     }
 }

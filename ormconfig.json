@@ -5,7 +5,7 @@
     "username": "med",
     "password": "med",
     "database": "typegraphql-example",
-    "logging": ["error", "query"],
+    "logging": false,
     "synchronize": true,
     "entities": ["src/entity/*.*"]
 }

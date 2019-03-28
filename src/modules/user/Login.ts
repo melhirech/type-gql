@@ -1,4 +1,4 @@
-import { MyContext } from './../../../type/MyContext';
+import { MyContext } from './../../../types/MyContext';
 import { Resolver, Mutation, Arg, Ctx } from 'type-graphql'
 import bcrypt from 'bcryptjs'
 import { User } from '../../entity/User'
@@ -14,6 +14,7 @@ export class LoginResolver {
 
         const user = await User.findOne({where: {email}})
         if (!user) return null
+        if (!user.confirmed) return null
         
         const isValid = await bcrypt.compare(password, user.password)
         if(!isValid) return null
