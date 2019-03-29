@@ -1,0 +1,4 @@
+[ GraphQLError {
+    message: 'Argument Validation Error',
+    locations: [ [Object] ],
+    path: [ 'register' ] } ]

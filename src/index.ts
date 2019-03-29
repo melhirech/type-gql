@@ -1,23 +1,20 @@
 import { ApolloServer } from 'apollo-server-express'
 import Express from 'express'
 import 'reflect-metadata'
-import { buildSchema } from 'type-graphql'
 import { createConnection } from 'typeorm'
 import session from 'express-session'
 import ConnectRedis from 'connect-redis'
 import { redis } from './../redis';
 import cors from 'cors'
+import { createSchema } from './utils/createSchema';
 
 
 const main = async () => {
     //connect to Postgres
     await createConnection()
 
-    const schema = await buildSchema({
-        resolvers: [__dirname + '/modules/**/*.ts'],
-        authChecker: ({ context: { req } }) => !!req.session.userId
-    });
-
+    const schema = await createSchema()
+    
     const apolloServer = new ApolloServer({
         schema,
         context: ({ req, res }: any) => ({ req, res })
