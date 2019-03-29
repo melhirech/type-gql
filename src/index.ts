@@ -1,5 +1,3 @@
-import { ConfirmUserResolver } from './modules/user/ConfirmUser';
-import { MeResolver } from './modules/user/Me';
 import { ApolloServer } from 'apollo-server-express'
 import Express from 'express'
 import 'reflect-metadata'
@@ -10,15 +8,13 @@ import ConnectRedis from 'connect-redis'
 import { redis } from './../redis';
 import cors from 'cors'
 
-import { RegisterResolver } from './modules/user/Register'
-import { LoginResolver } from './modules/user/Login'
 
 const main = async () => {
     //connect to Postgres
     await createConnection()
 
     const schema = await buildSchema({
-        resolvers: [RegisterResolver, LoginResolver, MeResolver, ConfirmUserResolver],
+        resolvers: [__dirname + '/modules/**/*.ts'],
         authChecker: ({ context: { req } }) => !!req.session.userId
     });
 

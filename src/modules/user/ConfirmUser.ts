@@ -1,3 +1,4 @@
+import { CONFIRM_EMAIL_PREFIX } from './../constants/redisPrefixes';
 import { Resolver, Mutation, Arg } from 'type-graphql'
 import { User } from '../../entity/User'
 import { redis } from './../../../redis'
@@ -6,11 +7,11 @@ import { redis } from './../../../redis'
 export class ConfirmUserResolver {
     @Mutation(() => Boolean)
     async confirmUser( @Arg("token") token: string ): Promise<boolean> {
-        const userId = await redis.get(token)
+        const userId = await redis.get(CONFIRM_EMAIL_PREFIX + token)
 
         if(!userId) return false
         User.update({ id: parseInt(userId, 10) }, { confirmed: true })
-        await redis.del(token)
+        await redis.del(CONFIRM_EMAIL_PREFIX + token)
 
         return true
     }
